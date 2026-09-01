@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Handlo — reuse auction house</title>
+  <link rel="icon" href="assets/handlo-icon.jpg">
+  <meta name="description" content="Handlo is an independent US swap-and-sell auction house. Reuse first, lower carbon. Not a donation site.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="assets/handlo-icon.jpg" alt="Handlo">
+      <div>
+        <p class="kicker"><a href="index.html">Handlo</a> · independent USA site</p>
+        <h1>Reuse Auction House</h1>
+      </div>
+    </div>
+    <div class="wallet">
+      <p class="eco-chip" id="ecoChip" title="Estimated CO2e avoided on items you reuse">0 kg CO₂e saved</p>
+      <button type="button" data-tab="mail">Mail <span id="mailCount">0</span></button>
+      <strong id="gold">$0.00</strong>
+      <button type="button" class="ghost" id="resetBtn">Reset demo</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Auction House">
+    <button type="button" data-tab="browse" class="on">Browse</button>
+    <button type="button" data-tab="bids">Bids</button>
+    <button type="button" data-tab="auctions">Auctions</button>
+    <button type="button" data-tab="auctioneer">Auctioneer</button>
+    <button type="button" data-tab="impact">Impact</button>
+    <button type="button" data-tab="mail">Mailbox</button>
+  </nav>
+
+  <main>
+    <section class="panel" id="panel-browse">
+      <p class="eco-banner">Every Handlo sale is a second life: less landfill, lower carbon than buying new. Estimates shown per item.</p>
+      <div class="browse-grid">
+        <div>
+          <div class="filters">
+            <input id="search" type="search" placeholder="Search name…">
+            <select id="category">
+              <option value="">All categories</option>
+              <option>Electronics</option>
+              <option>Home</option>
+              <option>Kitchen</option>
+              <option>Clothing</option>
+              <option>Sports</option>
+              <option>Office</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Seller</th>
+                  <th>Bid</th>
+                  <th>Buyout</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="browseBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <aside id="detail" class="card"></aside>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-bids" hidden>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Your bid</th><th>Buyout</th><th>Time</th></tr>
+          </thead>
+          <tbody id="bidsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-auctions" hidden>
+      <div class="post-grid">
+        <form id="postForm" class="card">
+          <h2>Create auction</h2>
+          <p class="muted">3.3.5 durations: 12 / 24 / 48 hours. Deposit 15% / 30% / 60% of vendor value. House cut 5% if it sells.</p>
+          <label>Item in bag
+            <select id="postItem" required></select>
+          </label>
+          <div class="row">
+            <label>Qty <input id="postQty" type="number" min="1" value="1" required></label>
+            <label>Duration
+              <select id="postHours">
+                <option value="12">12 hours</option>
+                <option value="24" selected>24 hours</option>
+                <option value="48">48 hours</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label>Starting bid $ <input id="postBid" type="number" min="0.01" step="0.01" required></label>
+            <label>Buyout $ <input id="postBuy" type="number" min="0" step="0.01" placeholder="optional"></label>
+          </div>
+          <p id="postMath" class="statline"></p>
+          <div class="actions">
+            <button type="button" class="ghost" id="fillAe">Fill from Auctioneer</button>
+            <button type="submit" class="coral">Post auction</button>
+          </div>
+        </form>
+        <div>
+          <h2>Your bag</h2>
+          <div id="bagBody" class="bag"></div>
+          <h2>Your auctions</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Bid</th><th>Buyout</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody id="mineBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-auctioneer" hidden>
+      <div class="ae-head card">
+        <div>
+          <h2>Auctioneer</h2>
+          <p id="scanStamp" class="muted"></p>
+        </div>
+        <div class="scan-wrap">
+          <button type="button" id="scanBtn">GetAll scan</button>
+          <div class="bar"><span id="scanBar"></span></div>
+          <p id="scanLabel" class="muted">Ready.</p>
+        </div>
+      </div>
+      <div class="ae-grid">
+        <div class="card">
+          <h3>Market (Appraiser)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Seen</th><th>Market /ea</th><th>Range</th><th>Conf.</th></tr>
+              </thead>
+              <tbody id="aeMarkets"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3>SearchUI deals</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Buyout</th><th>Market</th><th>Deal</th></tr>
+              </thead>
+              <tbody id="aeDeals"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>BeanCounter</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Item</th><th>Price</th></tr>
+            </thead>
+            <tbody id="aeHistory"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-impact" hidden>
+      <div class="ae-grid">
+        <div class="card">
+          <h2>Carbon loop</h2>
+          <p class="muted">Buying used on Handlo avoids the estimated manufacturing footprint of a new item. Not a donation platform. Independent site.</p>
+          <dl class="impact-dl">
+            <div><dt>Your reused items</dt><dd id="impactYou">0 kg</dd></div>
+            <div><dt>Live listings (potential)</dt><dd id="impactLive">0 kg</dd></div>
+            <div><dt>Completed reuse on this demo</dt><dd id="impactSold">0 kg</dd></div>
+          </dl>
+        </div>
+        <div class="card">
+          <h2>Why it counts</h2>
+          <ul class="impact-list">
+            <li>Swap or sell first — keep goods in circulation.</li>
+            <li>Each listing shows estimated kg CO₂e avoided vs new.</li>
+            <li>Local reuse cuts shipping and factory demand.</li>
+            <li>No charity checkout. This is a marketplace.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-mail" hidden>
+      <div id="mailList" class="mail"></div>
+    </section>
+  </main>
+
+  <p class="fineprint">Handlo is an independent reuse marketplace. Not a donation platform. Carbon figures are estimates of manufacturing CO₂e avoided by a second life. Auction rules follow public WotLK 3.3.5 formulas.</p>
+  <div id="toast" role="status"></div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/auctioneer.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/eco.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
