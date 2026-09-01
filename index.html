@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Handlo — Swap. Sell. Lower carbon.</title>
+  <title data-i18n="home.title">Handlo — Swap. Sell. Lower carbon.</title>
   <link rel="icon" href="assets/handlo-icon.jpg">
-  <meta name="description" content="Handlo is an independent US reuse auction house. Swap and sell used goods. Every sale is a second life and less carbon than buying new.">
+  <meta name="description" data-i18n="home.desc" content="Handlo is an independent US reuse auction house. Swap and sell used goods. Every sale is a second life and less carbon than buying new.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="home.css">
 </head>
 <body>
@@ -18,73 +18,78 @@
       <span>Handlo</span>
     </a>
     <nav>
-      <a href="#how">How it works</a>
-      <a href="#impact">Impact</a>
-      <a class="cta" href="auction.html">Enter Auction House</a>
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#impact" data-i18n="nav.impact">Impact</a>
+      <label class="lang-wrap">
+        <span class="visually-hidden" data-i18n="lang.label">Language</span>
+        <select id="langSelect" aria-label="Language"></select>
+      </label>
+      <a class="cta" href="auction.html" data-i18n="nav.enter">Enter Auction House</a>
     </nav>
   </header>
 
   <section class="hero">
-    <p class="kicker">Independent USA reuse marketplace</p>
-    <h1>Second life.<br>Lower carbon.</h1>
-    <p class="lead">Handlo is a swap-and-sell auction house. Goods change hands. New factories wait. Landfills get less.</p>
-    <p class="tag">Swap. Sell.</p>
+    <p class="kicker" data-i18n="hero.kicker">Independent USA reuse marketplace</p>
+    <h1 data-i18n-html="hero.h1">Second life.<br>Lower carbon.</h1>
+    <p class="lead" data-i18n="hero.lead">Handlo is a swap-and-sell auction house. Goods change hands. New factories wait. Landfills get less.</p>
+    <p class="tag" data-i18n="hero.tag">Swap. Sell.</p>
     <div class="hero-actions">
-      <a class="cta" href="auction.html">Enter Auction House</a>
-      <a class="ghost" href="#impact">See the carbon loop</a>
+      <a class="cta" href="auction.html" data-i18n="nav.enter">Enter Auction House</a>
+      <a class="ghost" href="#impact" data-i18n="hero.carbon">See the carbon loop</a>
     </div>
   </section>
 
   <section class="stats" aria-label="Reuse snapshot">
     <div>
-      <strong>12 / 24 / 48h</strong>
-      <span>Auction lengths</span>
+      <strong data-i18n="stat.hours">12 / 24 / 48h</strong>
+      <span data-i18n="stat.hoursL">Auction lengths</span>
     </div>
     <div>
-      <strong>Bid or buyout</strong>
-      <span>No charity checkout</span>
+      <strong data-i18n="stat.bid">Bid or buyout</strong>
+      <span data-i18n="stat.bidL">No charity checkout</span>
     </div>
     <div>
-      <strong>kg CO₂e</strong>
-      <span>Shown on every listing</span>
+      <strong data-i18n="stat.co2">kg CO₂e</strong>
+      <span data-i18n="stat.co2L">Shown on every listing</span>
     </div>
   </section>
 
   <section id="how" class="block">
-    <h2>How Handlo works</h2>
+    <h2 data-i18n="how.title">How Handlo works</h2>
     <div class="cards">
       <article>
         <p class="num">01</p>
-        <h3>List it</h3>
-        <p>Post a used item with a starting bid, optional buyout, and 12, 24, or 48 hours on the clock.</p>
+        <h3 data-i18n="how.1t">List it</h3>
+        <p data-i18n="how.1p">Post a used item with a starting bid, optional buyout, and 12, 24, or 48 hours on the clock.</p>
       </article>
       <article>
         <p class="num">02</p>
-        <h3>Swap or sell</h3>
-        <p>Someone bids up or hits buyout. The piece leaves your house and stays in use.</p>
+        <h3 data-i18n="how.2t">Swap or sell</h3>
+        <p data-i18n="how.2p">Someone bids up or hits buyout. The piece leaves your house and stays in use.</p>
       </article>
       <article>
         <p class="num">03</p>
-        <h3>Cut the footprint</h3>
-        <p>Each sale shows estimated CO₂e avoided versus making that item new. A loop, not a landfill.</p>
+        <h3 data-i18n="how.3t">Cut the footprint</h3>
+        <p data-i18n="how.3p">Each sale shows estimated CO₂e avoided versus making that item new. A loop, not a landfill.</p>
       </article>
     </div>
   </section>
 
   <section id="impact" class="block tint">
-    <h2>Recycling is the product</h2>
-    <p class="lead">Handlo is not a donation platform. It is a market. The green part is reuse: one less new mixer, bike, chair, or camera.</p>
+    <h2 data-i18n="imp.title">Recycling is the product</h2>
+    <p class="lead" data-i18n="imp.lead">Handlo is not a donation platform. It is a market. The green part is reuse: one less new mixer, bike, chair, or camera.</p>
     <ul class="ticks">
-      <li>Estimated carbon avoided is printed on every auction.</li>
-      <li>Your Impact tab totals what you kept in circulation.</li>
-      <li>USA only. Independent reuse marketplace.</li>
+      <li data-i18n="imp.t1">Estimated carbon avoided is printed on every auction.</li>
+      <li data-i18n="imp.t2">Your Impact tab totals what you kept in circulation.</li>
+      <li data-i18n="imp.t3">USA only. Independent reuse marketplace.</li>
     </ul>
-    <a class="cta" href="auction.html">Browse live auctions</a>
+    <a class="cta" href="auction.html" data-i18n="imp.browse">Browse live auctions</a>
   </section>
 
   <footer>
-    <p>Handlo · Swap. Sell. · Independent reuse auction house · handlo.us</p>
-    <p class="small">USA only. Carbon figures are manufacturing estimates, not lab measurements.</p>
+    <p data-i18n="foot.line">Handlo · Swap. Sell. · Independent reuse auction house · handlo.us</p>
+    <p class="small" data-i18n="foot.small">USA only. Carbon figures are manufacturing estimates, not lab measurements.</p>
   </footer>
+  <script src="js/i18n.js"></script>
 </body>
 </html>

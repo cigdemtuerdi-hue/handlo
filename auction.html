@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Handlo — reuse auction house</title>
+  <title data-i18n="ah.title">Handlo — reuse auction house</title>
   <link rel="icon" href="assets/handlo-icon.jpg">
-  <meta name="description" content="Handlo is an independent US swap-and-sell auction house. Reuse first, lower carbon. Not a donation site.">
+  <meta name="description" data-i18n="ah.desc" content="Handlo is an independent US swap-and-sell auction house. Reuse first, lower carbon. Not a donation site.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,54 +16,58 @@
     <div class="brand">
       <img src="assets/handlo-icon.jpg" alt="Handlo">
       <div>
-        <p class="kicker"><a href="index.html">Handlo</a> · independent USA site</p>
-        <h1>Reuse Auction House</h1>
+        <p class="kicker"><a href="index.html">Handlo</a> <span data-i18n="ah.kicker">· independent USA site</span></p>
+        <h1 data-i18n="ah.h1">Reuse Auction House</h1>
       </div>
     </div>
     <div class="wallet">
+      <label class="lang-wrap">
+        <span class="visually-hidden" data-i18n="lang.label">Language</span>
+        <select id="langSelect" aria-label="Language"></select>
+      </label>
       <p class="eco-chip" id="ecoChip" title="Estimated CO2e avoided on items you reuse">0 kg CO₂e saved</p>
-      <button type="button" data-tab="mail">Mail <span id="mailCount">0</span></button>
+      <button type="button" data-tab="mail"><span data-i18n="btn.mail">Mail</span> <span id="mailCount">0</span></button>
       <strong id="gold">$0.00</strong>
-      <button type="button" class="ghost" id="resetBtn">Reset demo</button>
+      <button type="button" class="ghost" id="resetBtn" data-i18n="btn.reset">Reset demo</button>
     </div>
   </header>
 
   <nav class="tabs" aria-label="Auction House">
-    <button type="button" data-tab="browse" class="on">Browse</button>
-    <button type="button" data-tab="bids">Bids</button>
-    <button type="button" data-tab="auctions">Auctions</button>
-    <button type="button" data-tab="auctioneer">Auctioneer</button>
-    <button type="button" data-tab="impact">Impact</button>
-    <button type="button" data-tab="mail">Mailbox</button>
+    <button type="button" data-tab="browse" class="on" data-i18n="tab.browse">Browse</button>
+    <button type="button" data-tab="bids" data-i18n="tab.bids">Bids</button>
+    <button type="button" data-tab="auctions" data-i18n="tab.auctions">Auctions</button>
+    <button type="button" data-tab="auctioneer" data-i18n="tab.auctioneer">Auctioneer</button>
+    <button type="button" data-tab="impact" data-i18n="tab.impact">Impact</button>
+    <button type="button" data-tab="mail" data-i18n="tab.mail">Mailbox</button>
   </nav>
 
   <main>
     <section class="panel" id="panel-browse">
-      <p class="eco-banner">Every Handlo sale is a second life: less landfill, lower carbon than buying new. Estimates shown per item.</p>
+      <p class="eco-banner" data-i18n="eco.banner">Every Handlo sale is a second life: less landfill, lower carbon than buying new. Estimates shown per item.</p>
       <div class="browse-grid">
         <div>
           <div class="filters">
-            <input id="search" type="search" placeholder="Search name…">
+            <input id="search" type="search" data-i18n-ph="search.ph" placeholder="Search name…">
             <select id="category">
-              <option value="">All categories</option>
-              <option>Electronics</option>
-              <option>Home</option>
-              <option>Kitchen</option>
-              <option>Clothing</option>
-              <option>Sports</option>
-              <option>Office</option>
+              <option value="" data-i18n="cat.all">All categories</option>
+              <option value="Electronics" data-i18n="cat.Electronics">Electronics</option>
+              <option value="Home" data-i18n="cat.Home">Home</option>
+              <option value="Kitchen" data-i18n="cat.Kitchen">Kitchen</option>
+              <option value="Clothing" data-i18n="cat.Clothing">Clothing</option>
+              <option value="Sports" data-i18n="cat.Sports">Sports</option>
+              <option value="Office" data-i18n="cat.Office">Office</option>
             </select>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Qty</th>
-                  <th>Seller</th>
-                  <th>Bid</th>
-                  <th>Buyout</th>
-                  <th>Time</th>
+                  <th data-i18n="th.item">Item</th>
+                  <th data-i18n="th.qty">Qty</th>
+                  <th data-i18n="th.seller">Seller</th>
+                  <th data-i18n="th.bid">Bid</th>
+                  <th data-i18n="th.buyout">Buyout</th>
+                  <th data-i18n="th.time">Time</th>
                 </tr>
               </thead>
               <tbody id="browseBody"></tbody>
@@ -78,7 +82,12 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Item</th><th>Your bid</th><th>Buyout</th><th>Time</th></tr>
+            <tr>
+              <th data-i18n="th.item">Item</th>
+              <th data-i18n="th.yourBid">Your bid</th>
+              <th data-i18n="th.buyout">Buyout</th>
+              <th data-i18n="th.time">Time</th>
+            </tr>
           </thead>
           <tbody id="bidsBody"></tbody>
         </table>
@@ -88,39 +97,45 @@
     <section class="panel" id="panel-auctions" hidden>
       <div class="post-grid">
         <form id="postForm" class="card">
-          <h2>Create auction</h2>
-          <p class="muted">3.3.5 durations: 12 / 24 / 48 hours. Deposit 15% / 30% / 60% of vendor value. House cut 5% if it sells.</p>
-          <label>Item in bag
+          <h2 data-i18n="post.title">Create auction</h2>
+          <p class="muted" data-i18n="post.help">3.3.5 durations: 12 / 24 / 48 hours. Deposit 15% / 30% / 60% of vendor value. House cut 5% if it sells.</p>
+          <label><span data-i18n="post.item">Item in bag</span>
             <select id="postItem" required></select>
           </label>
           <div class="row">
-            <label>Qty <input id="postQty" type="number" min="1" value="1" required></label>
-            <label>Duration
+            <label><span data-i18n="post.qty">Qty</span> <input id="postQty" type="number" min="1" value="1" required></label>
+            <label><span data-i18n="post.dur">Duration</span>
               <select id="postHours">
-                <option value="12">12 hours</option>
-                <option value="24" selected>24 hours</option>
-                <option value="48">48 hours</option>
+                <option value="12" data-i18n="post.h12">12 hours</option>
+                <option value="24" selected data-i18n="post.h24">24 hours</option>
+                <option value="48" data-i18n="post.h48">48 hours</option>
               </select>
             </label>
           </div>
           <div class="row">
-            <label>Starting bid $ <input id="postBid" type="number" min="0.01" step="0.01" required></label>
-            <label>Buyout $ <input id="postBuy" type="number" min="0" step="0.01" placeholder="optional"></label>
+            <label><span data-i18n="post.start">Starting bid $</span> <input id="postBid" type="number" min="0.01" step="0.01" required></label>
+            <label><span data-i18n="post.buy">Buyout $</span> <input id="postBuy" type="number" min="0" step="0.01" data-i18n-ph="post.optional" placeholder="optional"></label>
           </div>
           <p id="postMath" class="statline"></p>
           <div class="actions">
-            <button type="button" class="ghost" id="fillAe">Fill from Auctioneer</button>
-            <button type="submit" class="coral">Post auction</button>
+            <button type="button" class="ghost" id="fillAe" data-i18n="post.fill">Fill from Auctioneer</button>
+            <button type="submit" class="coral" data-i18n="post.submit">Post auction</button>
           </div>
         </form>
         <div>
-          <h2>Your bag</h2>
+          <h2 data-i18n="bag.title">Your bag</h2>
           <div id="bagBody" class="bag"></div>
-          <h2>Your auctions</h2>
+          <h2 data-i18n="mine.title">Your auctions</h2>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Item</th><th>Bid</th><th>Buyout</th><th>Status</th><th></th></tr>
+                <tr>
+                  <th data-i18n="th.item">Item</th>
+                  <th data-i18n="th.bid">Bid</th>
+                  <th data-i18n="th.buyout">Buyout</th>
+                  <th data-i18n="th.status">Status</th>
+                  <th></th>
+                </tr>
               </thead>
               <tbody id="mineBody"></tbody>
             </table>
@@ -132,33 +147,44 @@
     <section class="panel" id="panel-auctioneer" hidden>
       <div class="ae-head card">
         <div>
-          <h2>Auctioneer</h2>
+          <h2 data-i18n="ae.title">Auctioneer</h2>
           <p id="scanStamp" class="muted"></p>
         </div>
         <div class="scan-wrap">
-          <button type="button" id="scanBtn">GetAll scan</button>
+          <button type="button" id="scanBtn" data-i18n="ae.scan">GetAll scan</button>
           <div class="bar"><span id="scanBar"></span></div>
-          <p id="scanLabel" class="muted">Ready.</p>
+          <p id="scanLabel" class="muted" data-i18n="ae.ready">Ready.</p>
         </div>
       </div>
       <div class="ae-grid">
         <div class="card">
-          <h3>Market (Appraiser)</h3>
+          <h3 data-i18n="ae.market">Market (Appraiser)</h3>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Item</th><th>Seen</th><th>Market /ea</th><th>Range</th><th>Conf.</th></tr>
+                <tr>
+                  <th data-i18n="th.item">Item</th>
+                  <th data-i18n="ae.seen">Seen</th>
+                  <th data-i18n="ae.marketEa">Market /ea</th>
+                  <th data-i18n="ae.range">Range</th>
+                  <th data-i18n="ae.conf">Conf.</th>
+                </tr>
               </thead>
               <tbody id="aeMarkets"></tbody>
             </table>
           </div>
         </div>
         <div class="card">
-          <h3>SearchUI deals</h3>
+          <h3 data-i18n="ae.deals">SearchUI deals</h3>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Item</th><th>Buyout</th><th>Market</th><th>Deal</th></tr>
+                <tr>
+                  <th data-i18n="th.item">Item</th>
+                  <th data-i18n="th.buyout">Buyout</th>
+                  <th data-i18n="ae.market">Market</th>
+                  <th data-i18n="ae.deal">Deal</th>
+                </tr>
               </thead>
               <tbody id="aeDeals"></tbody>
             </table>
@@ -166,11 +192,15 @@
         </div>
       </div>
       <div class="card">
-        <h3>BeanCounter</h3>
+        <h3 data-i18n="ae.bean">BeanCounter</h3>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Type</th><th>Item</th><th>Price</th></tr>
+              <tr>
+                <th data-i18n="ae.type">Type</th>
+                <th data-i18n="th.item">Item</th>
+                <th data-i18n="ae.price">Price</th>
+              </tr>
             </thead>
             <tbody id="aeHistory"></tbody>
           </table>
@@ -181,21 +211,21 @@
     <section class="panel" id="panel-impact" hidden>
       <div class="ae-grid">
         <div class="card">
-          <h2>Carbon loop</h2>
-          <p class="muted">Buying used on Handlo avoids the estimated manufacturing footprint of a new item. Not a donation platform. Independent site.</p>
+          <h2 data-i18n="imp.loop">Carbon loop</h2>
+          <p class="muted" data-i18n="imp.muted">Buying used on Handlo avoids the estimated manufacturing footprint of a new item. Not a donation platform. Independent site.</p>
           <dl class="impact-dl">
-            <div><dt>Your reused items</dt><dd id="impactYou">0 kg</dd></div>
-            <div><dt>Live listings (potential)</dt><dd id="impactLive">0 kg</dd></div>
-            <div><dt>Completed reuse on this demo</dt><dd id="impactSold">0 kg</dd></div>
+            <div><dt data-i18n="imp.you">Your reused items</dt><dd id="impactYou">0 kg</dd></div>
+            <div><dt data-i18n="imp.live">Live listings (potential)</dt><dd id="impactLive">0 kg</dd></div>
+            <div><dt data-i18n="imp.sold">Completed reuse on this demo</dt><dd id="impactSold">0 kg</dd></div>
           </dl>
         </div>
         <div class="card">
-          <h2>Why it counts</h2>
+          <h2 data-i18n="imp.why">Why it counts</h2>
           <ul class="impact-list">
-            <li>Swap or sell first — keep goods in circulation.</li>
-            <li>Each listing shows estimated kg CO₂e avoided vs new.</li>
-            <li>Local reuse cuts shipping and factory demand.</li>
-            <li>No charity checkout. This is a marketplace.</li>
+            <li data-i18n="imp.l1">Swap or sell first — keep goods in circulation.</li>
+            <li data-i18n="imp.l2">Each listing shows estimated kg CO₂e avoided vs new.</li>
+            <li data-i18n="imp.l3">Local reuse cuts shipping and factory demand.</li>
+            <li data-i18n="imp.l4">No charity checkout. This is a marketplace.</li>
           </ul>
         </div>
       </div>
@@ -206,9 +236,10 @@
     </section>
   </main>
 
-  <p class="fineprint">Handlo is an independent reuse marketplace. Not a donation platform. Carbon figures are estimates of manufacturing CO₂e avoided by a second life. Auction rules follow public WotLK 3.3.5 formulas.</p>
+  <p class="fineprint" data-i18n="fineprint">Handlo is an independent reuse marketplace. Not a donation platform. Carbon figures are estimates of manufacturing CO₂e avoided by a second life. Auction rules follow public WotLK 3.3.5 formulas.</p>
   <div id="toast" role="status"></div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/auctioneer.js"></script>
   <script src="js/data.js"></script>

@@ -137,6 +137,32 @@ footer {
 }
 .small { font-size: 0.82rem; }
 
+.lang-wrap { display: inline-flex; align-items: center; }
+.lang-wrap select {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid var(--teal);
+  background: #fff;
+  color: var(--ink);
+  max-width: 11rem;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+html[dir="rtl"] body {
+  font-family: "Noto Naskh Arabic", "Source Sans 3", "Segoe UI", sans-serif;
+}
+
 @media (max-width: 800px) {
   .stats, .cards { grid-template-columns: 1fr; }
   .bar { flex-direction: column; align-items: flex-start; }
