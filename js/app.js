@@ -2,6 +2,8 @@
   const STORE_KEY = "handlo-ah-v1";
   const YOU = "You";
   const $ = (id) => document.getElementById(id);
+  const t = (key, vars) => (window.HandloI18n ? HandloI18n.t(key, vars) : key);
+  const sellerLabel = (name) => (name === YOU ? t("you") : name);
 
   const defaultState = () => ({
     gold: 50000,
@@ -44,11 +46,14 @@
     toast._t = setTimeout(() => el.classList.remove("show"), 2600);
   }
 
-  function addMail(title, body, gold, item) {
+  function addMail(titleKey, bodyKey, vars, gold, item) {
     state.mail.unshift({
       id: HandloAH.newId("mail"),
-      title,
-      body,
+      titleKey,
+      bodyKey,
+      vars: vars || {},
+      title: t(titleKey, vars),
+      body: t(bodyKey, vars),
       gold: gold || 0,
       item: item || null,
       at: now(),
@@ -66,12 +71,7 @@
         a.status = "expired";
         if (a.owner === YOU) {
           returnItem(a);
-          addMail(
-            "Auction expired: " + a.name,
-            "No bids. Deposit kept by the house. Item returned.",
-            0,
-            { name: a.name, qty: a.qty }
-          );
+          addMail("mail.expiredT", "mail.expiredB", { name: a.name }, 0, { name: a.name, qty: a.qty });
         }
         state.history.push({
           type: "expired",
@@ -98,15 +98,16 @@
     if (a.owner === YOU) {
       state.gold += a.deposit + payout;
       addMail(
-        "Auction sold: " + a.name,
-        `Sold for ${HandloAH.money(price)}. House cut ${HandloAH.money(HandloAH.houseCut(price))}. Deposit returned.`,
+        "mail.soldT",
+        "mail.soldB",
+        { name: a.name, money: HandloAH.money(price), cut: HandloAH.money(HandloAH.houseCut(price)) },
         a.deposit + payout,
         null
       );
     }
     if (buyer === YOU) {
       returnItem(a);
-      addMail("You won: " + a.name, `Paid ${HandloAH.money(price)}. Item delivered.`, 0, {
+      addMail("mail.wonT", "mail.wonB", { name: a.name, money: HandloAH.money(price) }, 0, {
         name: a.name,
         qty: a.qty,
       });
@@ -132,13 +133,14 @@
 
   function renderChrome() {
     $("gold").textContent = HandloAH.money(state.gold);
-    $("ecoChip").textContent = HandloEco.formatKg(HandloEco.reusedKg(state.history, YOU)) + " saved";
+    $("ecoChip").textContent = t("eco.saved", { kg: HandloEco.formatKg(HandloEco.reusedKg(state.history, YOU)) });
     const unread = state.mail.filter((m) => !m.read).length;
     $("mailCount").textContent = String(state.mail.length);
     $("mailCount").dataset.unread = unread ? "1" : "0";
+    const loc = window.HandloI18n ? HandloI18n.meta().locale : undefined;
     $("scanStamp").textContent = state.scan.ran
-      ? `Last GetAll: ${state.scan.count} live · ${new Date(state.scan.at).toLocaleTimeString()}`
-      : "Auctioneer has not scanned yet.";
+      ? t("ui.lastScan", { n: state.scan.count, time: new Date(state.scan.at).toLocaleTimeString(loc) })
+      : t("ui.noScan");
   }
 
   function renderBrowse() {
@@ -152,13 +154,16 @@
       .map((a) => {
         const bid = a.currentBid || a.startBid;
         const mine = a.owner === YOU;
+        const timeKey = HandloAH.timeLeftKey(a.expireAt, now());
+        const timeClass = timeKey === "veryLong" ? "very-long" : timeKey;
+        const catLabel = t("cat." + a.category) || a.category;
         return `<tr data-id="${a.id}" class="${a.id === selectedId ? "on" : ""}">
-          <td><strong>${escapeHtml(a.name)}</strong><div class="sub">${a.category}${mine ? " · yours" : ""} · ~${HandloEco.formatKg(HandloEco.kgFor(a.name, a.qty))}</div></td>
+          <td><strong>${escapeHtml(a.name)}</strong><div class="sub">${escapeHtml(catLabel)}${mine ? " · " + t("ui.yours") : ""} · ~${HandloEco.formatKg(HandloEco.kgFor(a.name, a.qty))}</div></td>
           <td>${a.qty}</td>
-          <td>${escapeHtml(a.seller)}</td>
+          <td>${escapeHtml(sellerLabel(a.seller))}</td>
           <td>${HandloAH.money(bid)}</td>
           <td>${a.buyout ? HandloAH.money(a.buyout) : "—"}</td>
-          <td><span class="pill ${HandloAH.timeLeftLabel(a.expireAt, now()).toLowerCase().replace(" ", "-")}">${HandloAH.timeLeftLabel(a.expireAt, now())}</span><div class="sub">${HandloAH.timeLeftClock(a.expireAt, now())}</div></td>
+          <td><span class="pill ${timeClass}">${HandloAH.timeLeftLabel(a.expireAt, now())}</span><div class="sub">${HandloAH.timeLeftClock(a.expireAt, now())}</div></td>
         </tr>`;
       })
       .join("");
@@ -168,7 +173,7 @@
     const a = selected();
     const box = $("detail");
     if (!a) {
-      box.innerHTML = "<p class='muted'>Select an auction.</p>";
+      box.innerHTML = `<p class='muted'>${t("ui.select")}</p>`;
       return;
     }
     const next = HandloAH.minNextBid(a);
@@ -176,24 +181,25 @@
     const canBid = a.owner !== YOU && state.gold >= next;
     const canBuy = a.owner !== YOU && a.buyout > 0 && state.gold >= a.buyout;
     const stat = Auctioneer.marketFor(live(), a.name);
+    const catLabel = t("cat." + a.category) || a.category;
     box.innerHTML = `
       <h3>${escapeHtml(a.name)}</h3>
-      <p class="muted">${a.qty} × ${a.category} · Seller ${escapeHtml(a.seller)}</p>
-      <p class="eco-note">Reuse vs new: about ${HandloEco.formatKg(HandloEco.kgFor(a.name, a.qty))} not made again. Estimate only.</p>
+      <p class="muted">${t("ui.qtyCat", { qty: a.qty, cat: catLabel })} · ${t("ui.seller", { name: escapeHtml(sellerLabel(a.seller)) })}</p>
+      <p class="eco-note">${t("ui.reuseNote", { kg: HandloEco.formatKg(HandloEco.kgFor(a.name, a.qty)) })}</p>
       <dl>
-        <div><dt>${hasBid ? "Current bid" : "Starting bid"}</dt><dd>${HandloAH.money(hasBid ? a.currentBid : a.startBid)}</dd></div>
-        <div><dt>${hasBid ? "Min next bid" : "First bid"}</dt><dd>${HandloAH.money(next)}</dd></div>
-        <div><dt>Buyout</dt><dd>${a.buyout ? HandloAH.money(a.buyout) : "None"}</dd></div>
-        <div><dt>Time</dt><dd>${HandloAH.timeLeftClock(a.expireAt, now())}</dd></div>
+        <div><dt>${hasBid ? t("ui.currentBid") : t("ui.startBid")}</dt><dd>${HandloAH.money(hasBid ? a.currentBid : a.startBid)}</dd></div>
+        <div><dt>${hasBid ? t("ui.minNext") : t("ui.firstBid")}</dt><dd>${HandloAH.money(next)}</dd></div>
+        <div><dt>${t("th.buyout")}</dt><dd>${a.buyout ? HandloAH.money(a.buyout) : t("ui.none")}</dd></div>
+        <div><dt>${t("th.time")}</dt><dd>${HandloAH.timeLeftClock(a.expireAt, now())}</dd></div>
       </dl>
       ${
         state.scan.ran && stat.samples
-          ? `<p class="statline">Auctioneer market ${HandloAH.money(stat.market)} /ea · ${stat.samples} buyouts · ${stat.confidence}% conf.</p>`
-          : `<p class="statline muted">Scan with Auctioneer to see market price.</p>`
+          ? `<p class="statline">${t("ui.aeMarket", { money: HandloAH.money(stat.market), n: stat.samples, conf: stat.confidence })}</p>`
+          : `<p class="statline muted">${t("ui.aeNeed")}</p>`
       }
       <div class="actions">
-        <button ${canBid ? "" : "disabled"} id="bidBtn">Bid ${HandloAH.money(next)}</button>
-        <button class="coral" ${canBuy ? "" : "disabled"} id="buyBtn">${a.buyout ? "Buyout " + HandloAH.money(a.buyout) : "No buyout"}</button>
+        <button ${canBid ? "" : "disabled"} id="bidBtn">${t("ui.bid", { money: HandloAH.money(next) })}</button>
+        <button class="coral" ${canBuy ? "" : "disabled"} id="buyBtn">${a.buyout ? t("ui.buyout", { money: HandloAH.money(a.buyout) }) : t("ui.noBuy")}</button>
       </div>
     `;
     const bidBtn = $("bidBtn");
@@ -208,7 +214,7 @@
       .map(
         (b, i) => `<button class="bag-item" data-i="${i}">
           <strong>${escapeHtml(b.name)}</strong>
-          <span>${b.qty} in bag · vendor ${HandloAH.money(b.vendor)}</span>
+          <span>${t("ui.inBag", { qty: b.qty, money: HandloAH.money(b.vendor) })}</span>
         </button>`
       )
       .join("");
@@ -223,12 +229,12 @@
               <td>${escapeHtml(a.name)} ×${a.qty}</td>
               <td>${HandloAH.money(a.currentBid || a.startBid)}</td>
               <td>${a.buyout ? HandloAH.money(a.buyout) : "—"}</td>
-              <td>${a.status}</td>
-              <td>${a.status === "live" ? `<button data-cancel="${a.id}">Cancel</button>` : ""}</td>
+              <td>${t("st." + a.status) || a.status}</td>
+              <td>${a.status === "live" ? `<button data-cancel="${a.id}">${t("ui.cancel")}</button>` : ""}</td>
             </tr>`
           )
           .join("")
-      : `<tr><td colspan="5" class="muted">You have no auctions.</td></tr>`;
+      : `<tr><td colspan="5" class="muted">${t("ui.noAuctions")}</td></tr>`;
   }
 
   function renderBids() {
@@ -244,7 +250,7 @@
             </tr>`
           )
           .join("")
-      : `<tr><td colspan="4" class="muted">You are not winning any bids.</td></tr>`;
+      : `<tr><td colspan="4" class="muted">${t("ui.noBids")}</td></tr>`;
   }
 
   function renderAuctioneer() {
@@ -268,11 +274,11 @@
               <td>${escapeHtml(d.auction.name)}</td>
               <td>${HandloAH.money(d.auction.buyout)}</td>
               <td>${HandloAH.money(d.stat.market)}</td>
-              <td class="deal">${d.pct}% of market</td>
+              <td class="deal">${t("ui.ofMarket", { pct: d.pct })}</td>
             </tr>`
           )
           .join("")
-      : `<tr><td colspan="4" class="muted">${state.scan.ran ? "No under-market buyouts right now." : "Run GetAll scan first."}</td></tr>`;
+      : `<tr><td colspan="4" class="muted">${state.scan.ran ? t("ui.noDeals") : t("ui.scanFirst")}</td></tr>`;
 
     $("aeHistory").innerHTML = state.history.length
       ? state.history
@@ -281,13 +287,13 @@
           .slice(0, 20)
           .map(
             (h) => `<tr>
-              <td>${h.type}</td>
+              <td>${t("st." + h.type) || h.type}</td>
               <td>${escapeHtml(h.name)} ×${h.qty || 1}</td>
               <td>${h.price ? HandloAH.money(h.price) : "—"}</td>
             </tr>`
           )
           .join("")
-      : `<tr><td colspan="3" class="muted">No BeanCounter history yet.</td></tr>`;
+      : `<tr><td colspan="3" class="muted">${t("ui.noHist")}</td></tr>`;
   }
 
   function renderImpact() {
@@ -301,14 +307,19 @@
     $("mailList").innerHTML = state.mail.length
       ? state.mail
           .map(
-            (m) => `<article class="${m.read ? "" : "unread"}">
-              <h4>${escapeHtml(m.title)}</h4>
-              <p>${escapeHtml(m.body)}</p>
-              <time>${new Date(m.at).toLocaleString()}</time>
-            </article>`
+            (m) => {
+              const title = m.titleKey ? t(m.titleKey, m.vars) : m.title;
+              const body = m.bodyKey ? t(m.bodyKey, m.vars) : m.body;
+              const loc = window.HandloI18n ? HandloI18n.meta().locale : undefined;
+              return `<article class="${m.read ? "" : "unread"}">
+              <h4>${escapeHtml(title)}</h4>
+              <p>${escapeHtml(body)}</p>
+              <time>${new Date(m.at).toLocaleString(loc)}</time>
+            </article>`;
+            }
           )
           .join("")
-      : "<p class='muted'>Mailbox empty.</p>";
+      : `<p class='muted'>${t("ui.mailEmpty")}</p>`;
     state.mail.forEach((m) => {
       m.read = true;
     });
@@ -340,31 +351,31 @@
     const a = live().find((x) => x.id === id);
     if (!a || a.owner === YOU) return;
     const next = HandloAH.minNextBid(a);
-    if (state.gold < next) return toast("Not enough money.");
+    if (state.gold < next) return toast(t("toast.noMoney"));
     if (a.buyout && next >= a.buyout) return buyout(id);
     if (a.bidder === YOU) state.gold += a.currentBid;
     else if (a.bidder) {
-      addMail("Outbid on " + a.name, `Your bid ${HandloAH.money(a.currentBid)} was returned.`, a.currentBid, null);
+      addMail("mail.outbidT", "mail.outbidB", { name: a.name, money: HandloAH.money(a.currentBid) }, a.currentBid, null);
       /* gold of previous NPC bidder is not tracked */
     }
     state.gold -= next;
     a.currentBid = next;
     a.bidder = YOU;
-    toast("Bid accepted: " + HandloAH.money(next));
+    toast(t("toast.bidOk", { money: HandloAH.money(next) }));
     render();
   }
 
   function buyout(id) {
     const a = live().find((x) => x.id === id);
     if (!a || !a.buyout || a.owner === YOU) return;
-    if (state.gold < a.buyout) return toast("Not enough money.");
+    if (state.gold < a.buyout) return toast(t("toast.noMoney"));
     if (a.bidder === YOU) state.gold += a.currentBid;
     else if (a.bidder) {
-      addMail("Outbid on " + a.name, `Buyout ended this auction. Bid ${HandloAH.money(a.currentBid)} returned.`, a.currentBid, null);
+      addMail("mail.outbidT", "mail.buyOutbidB", { name: a.name, money: HandloAH.money(a.currentBid) }, a.currentBid, null);
     }
     state.gold -= a.buyout;
     settleSale(a, a.buyout, YOU, "buyout");
-    toast("Buyout complete.");
+    toast(t("toast.buyOk"));
     selectedId = "";
     render();
   }
@@ -374,15 +385,15 @@
     if (!a || a.owner !== YOU) return;
     if (a.bidder === YOU) state.gold += a.currentBid;
     else if (a.bidder) {
-      addMail("Auction cancelled: " + a.name, `Your bid ${HandloAH.money(a.currentBid)} was returned.`, a.currentBid, null);
+      addMail("mail.cancelT", "mail.outbidB", { name: a.name, money: HandloAH.money(a.currentBid) }, a.currentBid, null);
     }
     a.status = "cancelled";
     returnItem(a);
-    addMail("You cancelled: " + a.name, "Deposit kept by the house. Item returned to your bag.", 0, {
+    addMail("mail.youCancelT", "mail.youCancelB", { name: a.name }, 0, {
       name: a.name,
       qty: a.qty,
     });
-    toast("Cancelled. Deposit lost.");
+    toast(t("toast.cancelled"));
     render();
   }
 
@@ -392,7 +403,7 @@
     const opts = state.bag
       .filter((b) => b.qty > 0)
       .map((b) => `<option value="${escapeHtml(b.name)}">${escapeHtml(b.name)} (${b.qty})</option>`);
-    sel.innerHTML = opts.join("") || `<option value="">Bag empty</option>`;
+    sel.innerHTML = opts.join("") || `<option value="">${t("ui.bagEmpty")}</option>`;
     if ([...sel.options].some((o) => o.value === current)) sel.value = current;
     updatePostMath();
   }
@@ -406,22 +417,19 @@
     const qty = Math.max(1, Number($("postQty").value) || 1);
     const hours = Number($("postHours").value);
     if (!item) {
-      $("postMath").textContent = "Pick an item from your bag.";
+      $("postMath").textContent = t("ui.pickBag");
       return;
     }
     $("postQty").max = item.qty;
     const deposit = HandloAH.depositCents(item.vendor * qty, hours);
     const suggest = HandloAH.suggestedStartBid(item.vendor) * qty;
     const ae = Auctioneer.appraise(live(), item.name, qty, item.vendor);
-    $("postMath").innerHTML = `
-      Deposit (${hours}h): <strong>${HandloAH.money(deposit)}</strong>
-      · 3.3.5 suggest start <strong>${HandloAH.money(suggest)}</strong>
-      ${
-        state.scan.ran && ae.stat.samples
-          ? `· Auctioneer undercut buyout <strong>${HandloAH.money(ae.buyout)}</strong>`
-          : "· Scan to fill Auctioneer prices"
-      }
-    `;
+    $("postMath").innerHTML =
+      t("ui.depositLine", { h: hours, dep: `<strong>${HandloAH.money(deposit)}</strong>`, start: `<strong>${HandloAH.money(suggest)}</strong>` }) +
+      " " +
+      (state.scan.ran && ae.stat.samples
+        ? t("ui.aeFill", { money: `<strong>${HandloAH.money(ae.buyout)}</strong>` })
+        : t("ui.scanToFill"));
     if (!$("postBid").dataset.touched) $("postBid").value = ((state.scan.ran && ae.stat.samples ? ae.startBid : suggest) / 100).toFixed(2);
     if (!$("postBuy").dataset.touched) $("postBuy").value = ((state.scan.ran && ae.stat.samples ? ae.buyout : Math.round(suggest * 1.25)) / 100).toFixed(2);
   }
@@ -429,16 +437,16 @@
   function postAuction(ev) {
     ev.preventDefault();
     const item = bagItem($("postItem").value);
-    if (!item) return toast("Nothing in bag.");
+    if (!item) return toast(t("toast.nothing"));
     const qty = Math.max(1, Math.min(item.qty, Number($("postQty").value) || 1));
     const hours = Number($("postHours").value);
     const startBid = Math.round(Number($("postBid").value) * 100);
     const buyRaw = $("postBuy").value;
     const buyoutAmt = buyRaw === "" ? 0 : Math.round(Number(buyRaw) * 100);
-    if (startBid < 1) return toast("Starting bid must be at least $0.01.");
-    if (buyoutAmt && buyoutAmt < startBid) return toast("Buyout cannot be below starting bid.");
+    if (startBid < 1) return toast(t("toast.minBid"));
+    if (buyoutAmt && buyoutAmt < startBid) return toast(t("toast.buyLow"));
     const deposit = HandloAH.depositCents(item.vendor * qty, hours);
-    if (state.gold < deposit) return toast("Not enough money for the deposit.");
+    if (state.gold < deposit) return toast(t("toast.deposit"));
     state.gold -= deposit;
     item.qty -= qty;
     state.auctions.unshift({
@@ -461,7 +469,7 @@
     });
     $("postBid").dataset.touched = "";
     $("postBuy").dataset.touched = "";
-    toast("Auction created. Deposit paid.");
+    toast(t("toast.created"));
     showTab("auctions");
     render();
   }
@@ -471,7 +479,7 @@
     const bar = $("scanBar");
     const label = $("scanLabel");
     let p = 0;
-    label.textContent = "GetAll scan…";
+    label.textContent = t("ui.scanning");
     bar.style.width = "0%";
     scanTimer = setInterval(() => {
       p += 8;
@@ -480,8 +488,8 @@
         clearInterval(scanTimer);
         scanTimer = null;
         state.scan = { ran: true, at: now(), count: live().length };
-        label.textContent = "Scan complete.";
-        toast("Auctioneer GetAll finished.");
+        label.textContent = t("ui.scanDone");
+        toast(t("toast.scanFin"));
         render();
       }
     }, 80);
@@ -501,7 +509,7 @@
     localStorage.removeItem(STORE_KEY);
     state = defaultState();
     selectedId = "";
-    toast("Demo reset.");
+    toast(t("toast.reset"));
     render();
   }
 
@@ -568,13 +576,20 @@
   $("fillAe").addEventListener("click", () => {
     const item = bagItem($("postItem").value);
     if (!item) return;
-    if (!state.scan.ran) return toast("Run GetAll scan first.");
+    if (!state.scan.ran) return toast(t("toast.scanFirst"));
     const qty = Math.max(1, Number($("postQty").value) || 1);
     const ae = Auctioneer.appraise(live(), item.name, qty, item.vendor);
     $("postBid").value = (ae.startBid / 100).toFixed(2);
     $("postBuy").value = (ae.buyout / 100).toFixed(2);
     $("postBid").dataset.touched = "1";
     $("postBuy").dataset.touched = "1";
+  });
+
+  document.addEventListener("handlo-lang", () => {
+    if (window.HandloI18n) HandloI18n.apply();
+    render();
+    const mailPanel = $("panel-mail");
+    if (mailPanel && !mailPanel.hidden) renderMail();
   });
 
   showTab("browse");

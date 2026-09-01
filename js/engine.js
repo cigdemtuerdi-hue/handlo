@@ -20,7 +20,8 @@
 
   function money(cents) {
     const n = Math.max(0, Math.round(Number(cents) || 0));
-    return (n / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+    const loc = (global.HandloI18n && HandloI18n.meta().locale) || "en-US";
+    return (n / 100).toLocaleString(loc, { style: "currency", currency: "USD" });
   }
 
   function depositCents(vendorCents, hours) {
@@ -51,14 +52,20 @@
     return winningBid - sellerPayout(winningBid);
   }
 
-  function timeLeftLabel(expireAt, now) {
+  function timeLeftKey(expireAt, now) {
     const ms = expireAt - now;
-    if (ms <= 0) return "Expired";
+    if (ms <= 0) return "expired";
     const hours = ms / 3600000;
-    if (hours > 12) return "Very Long";
-    if (hours > 2) return "Long";
-    if (hours > 0.5) return "Medium";
-    return "Short";
+    if (hours > 12) return "veryLong";
+    if (hours > 2) return "long";
+    if (hours > 0.5) return "medium";
+    return "short";
+  }
+
+  function timeLeftLabel(expireAt, now) {
+    const key = timeLeftKey(expireAt, now);
+    if (global.HandloI18n) return HandloI18n.t("time." + key);
+    return ({ expired: "Expired", veryLong: "Very Long", long: "Long", medium: "Medium", short: "Short" })[key];
   }
 
   function timeLeftClock(expireAt, now) {
@@ -84,6 +91,7 @@
     minNextBid,
     sellerPayout,
     houseCut,
+    timeLeftKey,
     timeLeftLabel,
     timeLeftClock,
     newId,
