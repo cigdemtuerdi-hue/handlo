@@ -11,6 +11,8 @@
     auctions: HandloData.seedAuctions(),
     mail: [],
     history: [],
+    likes: [],
+    cart: [],
     scan: { ran: false, at: 0, count: 0 },
   });
 
@@ -20,6 +22,8 @@
       if (!raw) return defaultState();
       const s = JSON.parse(raw);
       if (!s.auctions || !s.bag) return defaultState();
+      if (!Array.isArray(s.likes)) s.likes = [];
+      if (!Array.isArray(s.cart)) s.cart = [];
       return s;
     } catch {
       return defaultState();
@@ -133,6 +137,8 @@
 
   function renderChrome() {
     $("gold").textContent = HandloAH.money(state.gold);
+    if ($("cartCount")) $("cartCount").textContent = String((state.cart || []).length);
+    renderMemberChip();
     $("ecoChip").textContent = t("eco.saved", { kg: HandloEco.formatKg(HandloEco.reusedKg(state.history, YOU)) });
     const unread = state.mail.filter((m) => !m.read).length;
     $("mailCount").textContent = String(state.mail.length);
@@ -180,6 +186,8 @@
     const hasBid = a.currentBid > 0 && a.bidder;
     const canBid = a.owner !== YOU && state.gold >= next;
     const canBuy = a.owner !== YOU && a.buyout > 0 && state.gold >= a.buyout;
+    const liked = (state.likes || []).includes(a.id);
+    const inCart = (state.cart || []).some((c) => c.id === a.id);
     const stat = Auctioneer.marketFor(live(), a.name);
     const catLabel = t("cat." + a.category) || a.category;
     box.innerHTML = `
@@ -198,14 +206,24 @@
           : `<p class="statline muted">${t("ui.aeNeed")}</p>`
       }
       <div class="actions">
+        ${
+          a.owner === YOU
+            ? ""
+            : `<button class="ghost heart" id="likeBtn">${liked ? t("ui.liked") : t("ui.like")}</button>
+        <button class="ghost" id="cartBtn">${inCart ? t("ui.inCart") : t("ui.addCart")}</button>`
+        }
         <button ${canBid ? "" : "disabled"} id="bidBtn">${t("ui.bid", { money: HandloAH.money(next) })}</button>
         <button class="coral" ${canBuy ? "" : "disabled"} id="buyBtn">${a.buyout ? t("ui.buyout", { money: HandloAH.money(a.buyout) }) : t("ui.noBuy")}</button>
       </div>
     `;
     const bidBtn = $("bidBtn");
     const buyBtn = $("buyBtn");
+    const likeBtn = $("likeBtn");
+    const cartBtn = $("cartBtn");
     if (bidBtn) bidBtn.onclick = () => placeBid(a.id);
     if (buyBtn) buyBtn.onclick = () => buyout(a.id);
+    if (likeBtn) likeBtn.onclick = () => toggleLike(a.id);
+    if (cartBtn) cartBtn.onclick = () => addCart(a.id);
   }
 
   function renderBag() {
@@ -303,6 +321,50 @@
     $("impactSold").textContent = HandloEco.formatKg(HandloEco.reusedKg(state.history));
   }
 
+  function renderMemberChip() {
+    const chip = $("memberChip");
+    if (!chip || !window.HandloMember) return;
+    if (HandloMember.isVerified()) {
+      chip.classList.remove("need");
+      chip.textContent = HandloMember.displayName() || t("nav.account");
+      chip.href = "join.html";
+    } else if (HandloMember.isPending()) {
+      chip.classList.add("need");
+      chip.textContent = t("nav.verify");
+      chip.href = "join.html";
+    } else {
+      chip.classList.add("need");
+      chip.textContent = t("nav.join");
+      chip.href = "join.html";
+    }
+  }
+
+  function renderCart() {
+    const box = $("cartBody");
+    if (!box) return;
+    const rows = (state.cart || [])
+      .map((c) => live().find((a) => a.id === c.id))
+      .filter(Boolean);
+    box.innerHTML = rows.length
+      ? rows
+          .map((a) => {
+            const next = HandloAH.minNextBid(a);
+            return `<article class="card cart-item" data-id="${a.id}">
+              <div>
+                <strong>${escapeHtml(a.name)}</strong>
+                <p class="muted">${t("ui.seller", { name: escapeHtml(sellerLabel(a.seller)) })} · ${HandloAH.money(a.currentBid || a.startBid)}</p>
+              </div>
+              <div class="actions">
+                <button data-cart-bid="${a.id}">${t("ui.bid", { money: HandloAH.money(next) })}</button>
+                <button class="coral" data-cart-buy="${a.id}" ${a.buyout ? "" : "disabled"}>${a.buyout ? t("ui.buyout", { money: HandloAH.money(a.buyout) }) : t("ui.noBuy")}</button>
+                <button class="ghost" data-cart-remove="${a.id}">${t("ui.remove")}</button>
+              </div>
+            </article>`;
+          })
+          .join("")
+      : `<p class="muted">${t("ui.cartEmpty")}</p>`;
+  }
+
   function renderMail() {
     $("mailList").innerHTML = state.mail.length
       ? state.mail
@@ -335,6 +397,7 @@
     renderBids();
     renderAuctioneer();
     renderImpact();
+    renderCart();
     fillPostSelect();
     save();
   }
@@ -347,7 +410,34 @@
       .replace(/"/g, "&quot;");
   }
 
+  function toggleLike(id) {
+    if (window.HandloMember && !HandloMember.requireVerified({ kind: "like", id })) return;
+    const a = live().find((x) => x.id === id);
+    if (!a || a.owner === YOU) return;
+    const i = state.likes.indexOf(id);
+    if (i >= 0) state.likes.splice(i, 1);
+    else state.likes.push(id);
+    toast(t(i >= 0 ? "toast.unliked" : "toast.liked"));
+    render();
+  }
+
+  function addCart(id) {
+    if (window.HandloMember && !HandloMember.requireVerified({ kind: "cart", id })) return;
+    const a = live().find((x) => x.id === id);
+    if (!a || a.owner === YOU) return;
+    if (!state.likes.includes(id)) state.likes.push(id);
+    if (!state.cart.find((c) => c.id === id)) state.cart.push({ id, name: a.name, at: now() });
+    toast(t("toast.cartOk"));
+    render();
+  }
+
+  function removeCart(id) {
+    state.cart = state.cart.filter((c) => c.id !== id);
+    render();
+  }
+
   function placeBid(id) {
+    if (window.HandloMember && !HandloMember.requireVerified({ kind: "bid", id })) return;
     const a = live().find((x) => x.id === id);
     if (!a || a.owner === YOU) return;
     const next = HandloAH.minNextBid(a);
@@ -366,6 +456,7 @@
   }
 
   function buyout(id) {
+    if (window.HandloMember && !HandloMember.requireVerified({ kind: "buyout", id })) return;
     const a = live().find((x) => x.id === id);
     if (!a || !a.buyout || a.owner === YOU) return;
     if (state.gold < a.buyout) return toast(t("toast.noMoney"));
@@ -436,6 +527,7 @@
 
   function postAuction(ev) {
     ev.preventDefault();
+    if (window.HandloMember && !HandloMember.requireVerified({ kind: "post" })) return;
     const item = bagItem($("postItem").value);
     if (!item) return toast(t("toast.nothing"));
     const qty = Math.max(1, Math.min(item.qty, Number($("postQty").value) || 1));
@@ -511,6 +603,45 @@
     selectedId = "";
     toast(t("toast.reset"));
     render();
+  }
+
+  function resumeIntent() {
+    if (!window.HandloMember) return;
+    const params = new URLSearchParams(location.search);
+    const kind = params.get("intent") || "";
+    const id = params.get("id") || "";
+    if (kind && !HandloMember.isVerified()) {
+      HandloMember.openJoin({ kind, id });
+      return;
+    }
+    if (kind === "post" && HandloMember.isVerified()) showTab("auctions");
+    if (params.get("resume") !== "1" || !HandloMember.isVerified()) return;
+    const intent = HandloMember.takeIntent() || { kind, id };
+    if (intent.id) selectedId = intent.id;
+    if (intent.kind === "bid") placeBid(intent.id);
+    else if (intent.kind === "buyout") buyout(intent.id);
+    else if (intent.kind === "like") toggleLike(intent.id);
+    else if (intent.kind === "cart") {
+      addCart(intent.id);
+      showTab("cart");
+    } else if (intent.kind === "post") showTab("auctions");
+  }
+
+  if ($("cartBody")) {
+    $("cartBody").addEventListener("click", (e) => {
+      const bid = e.target.dataset.cartBid;
+      const buy = e.target.dataset.cartBuy;
+      const rm = e.target.dataset.cartRemove;
+      if (bid) {
+        selectedId = bid;
+        showTab("browse");
+        placeBid(bid);
+      } else if (buy) {
+        selectedId = buy;
+        showTab("browse");
+        buyout(buy);
+      } else if (rm) removeCart(rm);
+    });
   }
 
   $("browseBody").addEventListener("click", (e) => {
@@ -594,6 +725,7 @@
 
   showTab("browse");
   render();
+  resumeIntent();
   setInterval(() => {
     expireAuctions();
     renderBrowse();
