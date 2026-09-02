@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="member.verifyTitle">Verify your Handlo email</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:image" content="https://handlo.us/assets/handlo-icon.jpg">
+  <meta name="theme-color" content="#0b6e6a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="join-body">
+  <header class="top">
+    <a class="brand" href="index.html">
+      <img src="assets/handlo-icon.jpg" alt="Handlo">
+      <div>
+        <p class="kicker">Handlo</p>
+        <h1 data-i18n="member.verifyTitle">Verify your Handlo email</h1>
+      </div>
+    </a>
+    <div class="wallet">
+      <label class="lang-wrap">
+        <span class="visually-hidden" data-i18n="lang.label">Language</span>
+        <select id="langSelect" aria-label="Language"></select>
+      </label>
+      <a class="exit-page" href="index.html" data-i18n-title="nav.exit" title="Leave page">
+        <span class="visually-hidden" data-i18n="nav.exit">Leave page</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="join-main">
+    <section class="card join-card">
+      <h2 id="verifyHead"></h2>
+      <p id="verifyBody" class="lead-p"></p>
+      <div class="actions">
+        <a class="cta-btn" id="verifyGo" href="auction.html" data-i18n="member.continue">Continue</a>
+        <a class="ghost" href="join.html" data-i18n="nav.join">Create account</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/member.js"></script>
+  <script>
+    (function () {
+      const t = (key, vars) => (window.HandloI18n ? HandloI18n.t(key, vars) : key);
+      const token = new URLSearchParams(location.search).get("token") || "";
+      const res = HandloMember.verifyToken(token);
+      const head = document.getElementById("verifyHead");
+      const body = document.getElementById("verifyBody");
+      const go = document.getElementById("verifyGo");
+      if (res.ok) {
+        head.textContent = t("member.verified");
+        body.textContent = t("member.verifiedLead");
+        go.href = HandloMember.continueHref();
+      } else if (HandloMember.isVerified()) {
+        head.textContent = t("member.already");
+        body.textContent = t("member.verifiedLead");
+        go.href = HandloMember.continueHref();
+      } else {
+        head.textContent = t("member.invalidLink");
+        body.textContent = t("member.invalidHelp");
+        go.href = "join.html";
+        go.textContent = t("nav.join");
+      }
+    })();
+  </script>
+</body>
+</html>

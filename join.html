@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="member.title">Create your Handlo account</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:image" content="https://handlo.us/assets/handlo-icon.jpg">
+  <meta name="theme-color" content="#0b6e6a">
+  <meta name="description" data-i18n="member.desc" content="USA members only. Verify your email, then continue listing, bidding, or adding to cart.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Outfit:wght@500;650;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="join-body">
+  <header class="top">
+    <a class="brand" href="index.html">
+      <img src="assets/handlo-icon.jpg" alt="Handlo">
+      <div>
+        <p class="kicker">Handlo <span data-i18n="ah.kicker">· independent USA site</span></p>
+        <h1 data-i18n="member.title">Create your Handlo account</h1>
+      </div>
+    </a>
+    <div class="wallet">
+      <label class="lang-wrap">
+        <span class="visually-hidden" data-i18n="lang.label">Language</span>
+        <select id="langSelect" aria-label="Language"></select>
+      </label>
+      <a class="ghost" href="auction.html" data-i18n="nav.enter">Enter Auction House</a>
+      <a class="exit-page" href="index.html" data-i18n-title="nav.exit" title="Leave page">
+        <span class="visually-hidden" data-i18n="nav.exit">Leave page</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="join-main">
+    <section class="card join-card" id="formCard">
+      <p class="muted" data-i18n="member.lead">Membership is required to post a listing, place a bid, like an item, or add it to your cart.</p>
+      <form id="joinForm" novalidate>
+        <div class="row">
+          <label><span data-i18n="member.first">First name</span>
+            <input id="firstName" name="firstName" autocomplete="given-name" required>
+          </label>
+          <label><span data-i18n="member.last">Last name</span>
+            <input id="lastName" name="lastName" autocomplete="family-name" required>
+          </label>
+        </div>
+
+        <label class="mailbox-label"><span data-i18n="member.mailbox">Street, PO Box, or ZIP</span>
+          <input id="mailbox" name="mailbox" autocomplete="off" data-i18n-ph="member.mailboxPh" placeholder="Type ZIP or mailbox…">
+          <ul id="suggest" class="suggest" hidden></ul>
+        </label>
+        <p class="muted" data-i18n="member.mailboxHelp">Type a US ZIP or address. Choose your place from the list, same idea as a mailbox lookup.</p>
+
+        <label><span data-i18n="member.street">Street or PO Box</span>
+          <input id="line" name="line" autocomplete="address-line1" required>
+        </label>
+        <div class="row three">
+          <label><span data-i18n="member.city">City</span>
+            <input id="city" name="city" autocomplete="address-level2" required>
+          </label>
+          <label><span data-i18n="member.state">State</span>
+            <input id="state" name="state" autocomplete="address-level1" maxlength="20" required>
+          </label>
+          <label><span data-i18n="member.zip">ZIP</span>
+            <input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="10" required>
+          </label>
+        </div>
+        <p class="muted" data-i18n="member.usa">USA addresses only.</p>
+
+        <label><span data-i18n="member.email">Email</span>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+        </label>
+        <label><span data-i18n="member.email2">Confirm email</span>
+          <input id="email2" name="email2" type="email" autocomplete="email" required>
+        </label>
+        <label><span data-i18n="member.phone">Mobile phone</span>
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" data-i18n-ph="member.phonePh" placeholder="(555) 555-0100" required>
+        </label>
+
+        <p id="joinError" class="form-error" hidden></p>
+        <div class="actions">
+          <button type="submit" class="coral" data-i18n="member.submit">Create account</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card join-card" id="pendingCard" hidden>
+      <h2 data-i18n="member.pending">Check your email</h2>
+      <p id="pendingBody" class="lead-p"></p>
+      <article class="verify-mail">
+        <p class="kicker" data-i18n="member.mailFrom">Handlo · membership</p>
+        <h3 data-i18n="member.mailSubj">Confirm your Handlo account</h3>
+        <p id="mailTo" class="muted"></p>
+        <p data-i18n="member.mailBody">Tap the link to approve your membership, then continue what you started.</p>
+        <a class="cta-btn" id="verifyLink" href="verify.html" data-i18n="member.mailCta">Approve membership</a>
+      </article>
+      <p class="muted" data-i18n="member.demoMailNote">This demo shows the email on this page. After a mail server is connected, the same link arrives in your inbox.</p>
+      <div class="actions">
+        <button type="button" class="ghost" id="startOver" data-i18n="member.startOver">Use a different email</button>
+      </div>
+    </section>
+
+    <section class="card join-card" id="doneCard" hidden>
+      <h2 data-i18n="member.verified">Membership approved. You can continue.</h2>
+      <p class="lead-p" data-i18n="member.verifiedLead">Your email is confirmed. Handlo is unlocked for listing, bids, likes, and cart.</p>
+      <div class="actions">
+        <a class="cta-btn" id="continueLink" href="auction.html" data-i18n="member.continue">Continue</a>
+      </div>
+    </section>
+  </main>
+
+  <p class="fineprint" data-i18n="fineprint">Handlo is an independent reuse marketplace. Not a donation platform. Carbon figures are estimates of manufacturing CO₂e avoided by a second life. Auction rules follow public WotLK 3.3.5 formulas.</p>
+  <div id="toast" role="status"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/member.js"></script>
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const t = (key, vars) => (window.HandloI18n ? HandloI18n.t(key, vars) : key);
+      const M = window.HandloMember;
+
+      function show(which) {
+        $("formCard").hidden = which !== "form";
+        $("pendingCard").hidden = which !== "pending";
+        $("doneCard").hidden = which !== "done";
+      }
+
+      function fillPending(a) {
+        $("pendingBody").textContent = t("member.pendingBody", { email: a.email });
+        $("mailTo").textContent = a.email;
+        $("verifyLink").href = M.verifyHref(a.token);
+        show("pending");
+      }
+
+      function paint() {
+        if (M.isVerified()) {
+          $("continueLink").href = M.continueHref();
+          show("done");
+          return;
+        }
+        if (M.isPending()) {
+          fillPending(M.account());
+          return;
+        }
+        show("form");
+      }
+
+      M.bindMailbox($("mailbox"), $("suggest"), (row) => {
+        $("mailbox").value = row.label;
+        if (row.line) $("line").value = row.line;
+        $("city").value = row.city || "";
+        $("state").value = row.state || "";
+        $("zip").value = row.zip || "";
+        if (!row.line) $("line").focus();
+      });
+
+      $("joinForm").addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const draft = {
+          firstName: $("firstName").value,
+          lastName: $("lastName").value,
+          email: $("email").value,
+          email2: $("email2").value,
+          phone: $("phone").value,
+          line: $("line").value,
+          city: $("city").value,
+          state: $("state").value,
+          zip: $("zip").value,
+          country: "US",
+          label: $("mailbox").value,
+        };
+        const res = M.createPending(draft);
+        if (!res.ok) {
+          $("joinError").hidden = false;
+          $("joinError").textContent = t(res.error);
+          return;
+        }
+        $("joinError").hidden = true;
+        fillPending(res.account);
+      });
+
+      $("startOver").addEventListener("click", () => {
+        M.startOver();
+        $("joinForm").reset();
+        $("joinError").hidden = true;
+        show("form");
+      });
+
+      const params = new URLSearchParams(location.search);
+      const intent = params.get("intent");
+      const id = params.get("id");
+      if (intent) M.savePendingIntent({ kind: intent, id: id || "" });
+
+      document.addEventListener("handlo-lang", paint);
+      paint();
+    })();
+  </script>
+</body>
+</html>

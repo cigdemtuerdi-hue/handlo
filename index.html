@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="home.title">Handlo — Swap. Sell. Lower carbon.</title>
-  <link rel="icon" href="assets/handlo-icon.jpg">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:image" content="https://handlo.us/assets/handlo-icon.jpg">
+  <meta name="theme-color" content="#0b6e6a">
   <meta name="description" data-i18n="home.desc" content="Handlo is an independent US reuse auction house. Swap and sell used goods. Every sale is a second life and less carbon than buying new.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,11 +29,17 @@
         <span class="visually-hidden" data-i18n="lang.label">Language</span>
         <select id="langSelect" aria-label="Language"></select>
       </label>
+      <a href="join.html" data-i18n="nav.join">Create account</a>
       <a class="cta" href="auction.html" data-i18n="nav.enter">Enter Auction House</a>
+      <a class="exit-page" href="index.html" data-exit="back" data-i18n-title="nav.exit" title="Leave page">
+        <span class="visually-hidden" data-i18n="nav.exit">Leave page</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
     </nav>
   </header>
 
   <section class="hero">
+    <img class="hero-mark" src="assets/handlo-icon.jpg" alt="Handlo">
     <p class="kicker" data-i18n="hero.kicker">Independent USA reuse marketplace</p>
     <h1 data-i18n-html="hero.h1">Second life.<br>Lower carbon.</h1>
     <p class="lead" data-i18n="hero.lead">Handlo is a swap-and-sell auction house. Goods change hands. New factories wait. Landfills get less.</p>
@@ -59,7 +70,7 @@
     <div class="cards">
       <article>
         <p class="num">01</p>
-        <h3 data-i18n="how.1t">List it</h3>
+        <h3><a href="auction.html?intent=post" data-i18n="how.1t">List it</a></h3>
         <p data-i18n="how.1p">Post a used item with a starting bid, optional buyout, and 12, 24, or 48 hours on the clock.</p>
       </article>
       <article>
@@ -91,5 +102,27 @@
     <p class="small" data-i18n="foot.small">USA only. Carbon figures are manufacturing estimates, not lab measurements.</p>
   </footer>
   <script src="js/i18n.js"></script>
+  <script src="js/member.js"></script>
+  <script>
+    (function () {
+      document.querySelectorAll("a.exit-page[data-exit='back']").forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+          if (history.length > 1) {
+            ev.preventDefault();
+            history.back();
+          }
+        });
+      });
+      document.querySelectorAll('a[href^="auction.html?intent="]').forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+          if (window.HandloMember && !HandloMember.isVerified()) {
+            ev.preventDefault();
+            const u = new URL(a.href, location.href);
+            HandloMember.openJoin({ kind: u.searchParams.get("intent") || "post", id: u.searchParams.get("id") || "" });
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

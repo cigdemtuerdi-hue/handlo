@@ -30,7 +30,13 @@
         <span class="visually-hidden" data-i18n="lang.label">Language</span>
         <select id="langSelect" aria-label="Language"></select>
       </label>
+      <a class="exit-page" href="index.html" data-i18n-title="nav.exit" title="Leave page">
+        <span class="visually-hidden" data-i18n="nav.exit">Leave page</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
+      <a class="member-chip need" id="memberChip" href="join.html" data-i18n="nav.join">Create account</a>
       <p class="eco-chip" id="ecoChip" title="Estimated CO2e avoided on items you reuse">0 kg CO₂e saved</p>
+      <button type="button" data-tab="cart"><span data-i18n="tab.cart">Cart</span> <span id="cartCount">0</span></button>
       <button type="button" data-tab="mail"><span data-i18n="btn.mail">Mail</span> <span id="mailCount">0</span></button>
       <strong id="gold">$0.00</strong>
       <button type="button" class="ghost" id="resetBtn" data-i18n="btn.reset">Reset demo</button>
@@ -43,6 +49,7 @@
     <button type="button" data-tab="auctions" data-i18n="tab.auctions">Auctions</button>
     <button type="button" data-tab="auctioneer" data-i18n="tab.auctioneer">Auctioneer</button>
     <button type="button" data-tab="impact" data-i18n="tab.impact">Impact</button>
+    <button type="button" data-tab="cart" data-i18n="tab.cart">Cart</button>
     <button type="button" data-tab="mail" data-i18n="tab.mail">Mailbox</button>
   </nav>
 
@@ -237,6 +244,10 @@
       </div>
     </section>
 
+    <section class="panel" id="panel-cart" hidden>
+      <div id="cartBody" class="cart-list"></div>
+    </section>
+
     <section class="panel" id="panel-mail" hidden>
       <div id="mailList" class="mail"></div>
     </section>
@@ -246,6 +257,7 @@
   <div id="toast" role="status"></div>
 
   <script src="js/i18n.js"></script>
+  <script src="js/member.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/auctioneer.js"></script>
   <script src="js/data.js"></script>
