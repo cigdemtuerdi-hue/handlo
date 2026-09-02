@@ -74,6 +74,7 @@ nav a { color: var(--ink); text-decoration: none; font-weight: 600; }
   box-shadow: inset 0 0 0 1.5px var(--teal);
   text-decoration: none;
   flex: 0 0 auto;
+  margin-inline-start: 0.15rem;
 }
 .exit-page svg { width: 1.25rem; height: 1.25rem; fill: currentColor; display: block; }
 html[dir="rtl"] .exit-page svg { transform: scaleX(-1); }
